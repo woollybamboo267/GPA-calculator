@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Calculator</title>
+</head>
+<body>
+    <h1>GPA Calculator</h1>
+
+    <p id="summary">This is a GPA calculator. It calculates both your weighted and unweighted GPA. Enter the letter grade, weight, and credits for each course. You can add as many courses as you like. Press Enter after each input, and type 'y' or 'n' to add more courses.</p>
+
+    <div id="promptsContainer"></div>
+    <div id="resultContainer"></div>
+
+    <button onclick="addCourse()">Add Course</button>
+    <button onclick="calculateGPA()">Calculate GPA</button>
+    <button onclick="restart()">Restart</button>
+
+    <script>
+        function restart() {
+            // Clear the prompts and result
+            document.getElementById("promptsContainer").innerHTML = "";
+            document.getElementById("resultContainer").innerHTML = "";
+
+            // Display the summary again
+            document.getElementById("summary").innerHTML = "This is a GPA calculator. It calculates both your weighted and unweighted GPA. Enter the letter grade, weight, and credits for each course. You can add as many courses as you like. Press Enter after each input, and type 'y' or 'n' to add more courses.";
+            
+            // Execute the GPA calculator function
+            calculateGPA();
+        }
+
+        function addCourse() {
+            // Display prompts on the webpage
+            promptsContainer.innerHTML += "<p>Class Grade(A, B, C, D, E): <input type='text' id='classGrade'></p>";
+            promptsContainer.innerHTML += "<p>Class Weight(AP, GT, honors, regular): <input type='text' id='classWeight'></p>";
+            promptsContainer.innerHTML += "<p>Class credits: <input type='text' id='classCredits'></p>";
+        }
+
+        async function calculateGPA() {
+            const promptsContainer = document.getElementById("promptsContainer");
+            const resultContainer = document.getElementById("resultContainer");
+
+            // Initialize the GPA weights dictionary
+            const gpaWeights = {
+                'ap': {'a': 5.0, 'b': 4.0, 'c': 3.0, 'd': 1.0, 'e': 0.0},
+                'gt': {'a': 5.0, 'b': 4.0, 'c': 3.0, 'd': 1.0, 'e': 0.0},
+                'honors': {'a': 4.5, 'b': 3.5, 'c': 2.5, 'd': 1.0, 'e': 0.0},
+                'regular': {'a': 4.0, 'b': 3.0, 'c': 2.0, 'd': 1.0, 'e': 0.0}
+            };
+
+            let Grades = [];
+            let Weights = [];
+            let Credits = [];
+
+            let addingCourses = true;
+
+            // Retrieve input values
+            let classGrade = document.getElementById('classGrade').value.toLowerCase();
+            let classWeight = document.getElementById('classWeight').value.toLowerCase();
+            let classCredits = document.getElementById('classCredits').value;
+
+            // Validate inputs
+            if (!['a', 'b', 'c', 'd', 'e'].includes(classGrade) ||
+                !['ap', 'gt', 'honors', 'regular'].includes(classWeight) ||
+                !/^-?\d*\.?\d+$/.test(classCredits)) {
+                promptsContainer.innerHTML += "<p>Please enter valid inputs.</p>";
+                return;
+            }
+
+            // Store input values
+            Grades.push(classGrade);
+            Weights.push(classWeight);
+            Credits.push(parseFloat(classCredits));
+
+            // Perform GPA calculation
+            const gpaValues = [];
+
+            for (let index = 0; index < Grades.length; index++) {
+                const gpaValue = gpaWeights[Weights[index]][Grades[index]] * Credits[index];
+                gpaValues.push(gpaValue);
+            }
+
+            const totalGPA = gpaValues.reduce((acc, val) => acc + val, 0);
+            const totalCredits = Credits.reduce((acc, val) => acc + val, 0);
+
+            const unweightedGPA = (totalGPA / totalCredits).toFixed(2);
+
+            // Display the unweighted GPA on the webpage
+            resultContainer.innerHTML = `<p>Unweighted GPA: ${unweightedGPA}</p>`;
+        }
+    </script>
+</body>
+</html>
